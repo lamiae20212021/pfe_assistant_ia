@@ -61,11 +61,11 @@ def login_page():
     col_left, col_center, col_right = st.columns([1, 5, 1])
 
     with col_left:
-        st.image("DSP.png", width=110)
+        st.image("streamlit_app/DSP.png", width=110)
     with col_center:
         pass
     with col_right:
-        st.image("IEF2I.png", width=110)
+        st.image("streamlit_app/IEF2I.png", width=110)
 
     # --- Styles CSS ---
     st.markdown("""
