@@ -1,0 +1,56 @@
+version: '3.8'
+
+services:
+  db:
+    image: postgres:15
+    container_name: postgres_ai
+    restart: always
+    environment:
+      POSTGRES_USER: user
+      POSTGRES_PASSWORD: password
+      POSTGRES_DB: articles_db
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+
+  airflow:
+    image: apache/airflow:2.9.0
+    container_name: airflow_ai
+    restart: always
+    depends_on:
+      - db
+    environment:
+      - AIRFLOW__CORE__EXECUTOR=SequentialExecutor
+      #- AIRFLOW__DATABASE__SQL_ALCHEMY_CONN=sqlite:////opt/airflow/airflow.db
+      - AIRFLOW__DATABASE__SQL_ALCHEMY_CONN=postgresql+psycopg2://user:password@db:5432/articles_db
+      - AIRFLOW__CORE__LOAD_EXAMPLES=False
+      - PYTHONWARNINGS=ignore   
+    volumes:
+      - ./dags:/opt/airflow/dags
+      - ./scripts:/opt/airflow/scripts
+    ports:
+      - "8080:8080"
+    command: >
+      bash -c "airflow db init &&
+               airflow users create --username admin --firstname Imane --lastname Admin --role Admin --email admin@example.com --password admin &&
+               airflow webserver & airflow scheduler"
+
+  streamlit:
+    build: ./streamlit_app          # <--- on utilise TON Dockerfile
+    container_name: streamlit_ai
+    restart: always
+    working_dir: /app
+    volumes:
+    - ./streamlit_app:/app
+    env_file:
+    - .env  
+    ports:
+    - "8501:8501"
+    dns:
+    - 8.8.8.8
+    - 1.1.1.1
+
+
+volumes:
+  postgres_data:

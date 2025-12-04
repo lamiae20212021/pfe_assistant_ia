@@ -1,0 +1,7 @@
+streamlit
+sqlalchemy
+psycopg2-binary
+pandas
+sib_api_v3_sdk
+openai
+matplotlib
